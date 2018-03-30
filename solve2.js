@@ -15,10 +15,8 @@ function printGrid(grid,N) {
             if (grid[row][col]!='')
                 document.getElementsByName('cell')[pos].value = grid[row][col];
             pos++;
-            
         }
-    }
-    
+    } 
 }
 
 function clearGrid (N , isOverided = false) {
@@ -137,7 +135,7 @@ function findUnassignedLocation(grid){
     for (let icol = 0; icol < N; icol++)
         if (grid[irow][icol] == UNASSIGNED)
         {
-            return [irow,icol]
+            return [irow,icol];
         }
         
     return [];
@@ -182,11 +180,11 @@ function checkSubmit (grid) {
         for (let col = 0; col<N; col++){
             if(grid[row][col] != document.getElementsByName('cell')[getPos(row,col)].value)
             {
-                document.getElementsByName('cell')[getPos(row,col)].classList.add('bg-danger')
+                document.getElementsByName('cell')[getPos(row,col)].classList.add('bg-danger');
                 f=true;
             }
             else{
-                document.getElementsByName('cell')[getPos(row,col)].classList.remove('bg-danger')
+                document.getElementsByName('cell')[getPos(row,col)].classList.remove('bg-danger');
             }
 
         }
@@ -213,7 +211,7 @@ function createEmptyPuzzle (N=9) {
 }
 
 function randomNumber (N=9) {
-    let randomnum=Math.floor((Math.random() * N))
+    let randomnum=Math.floor((Math.random() * N));
     return randomnum<0?0:randomnum;
 }
 
@@ -254,12 +252,10 @@ function createRandomPuzzle (level=EASY) {
 function solveSudoku (grid ,sleepTime = 0) {
 
     let logSolve = []; // Log step by step in algorithm
-    let i = 0; // index in logSovle
+    let i = 0; // index in logSolve
     let UnassignedLocation=[];
     let isFilled; // flag true if 
-    // let numToStart=1;
     let possibleNum = [1,2,3,4,5,6,7,8,9];
-    let stepDone;
     while (!isEmpty(UnassignedLocation = findUnassignedLocation(grid))) {
         isFilled= false;
 
@@ -293,7 +289,7 @@ function solveSudoku (grid ,sleepTime = 0) {
 
 let grid=[];
 let gridOriginal=[];
-let log = []
+let log = [];
 let canceled;
 let isPrinting;
 
@@ -341,7 +337,7 @@ document.getElementById('createSodoku').addEventListener('click', function () {
     document.getElementById('Solved').classList.add('invisible');
     document.getElementById('canceled').classList.add('invisible');
     // alert('message?: DOMString')
-})
+});
 document.getElementById('solveSudoku').addEventListener('click',async function () {
     // isPrinting = false;
     log=[];
@@ -377,9 +373,6 @@ document.getElementById('cancelSodoku').addEventListener('click', function () {
         canceled = true;
         document.getElementById('canceled').classList.remove('invisible');
     }
-        
-
-
-})
+});
 
 
