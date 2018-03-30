@@ -366,8 +366,10 @@ document.getElementById('submit').addEventListener('click', function () {
 
 });
 document.getElementById('cancelSodoku').addEventListener('click', function () {
-    canceled = true;
-    document.getElementById('canceled').classList.remove('invisible');
+    if (!isSolved) {
+        canceled = true;
+        document.getElementById('canceled').classList.remove('invisible');
+    }
 
 })
 
