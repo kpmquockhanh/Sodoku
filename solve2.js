@@ -159,7 +159,7 @@ function analysisLog (log) {
                 log.splice(j, 1 );
 }
 async function printGridStepbyStep(log, delay, isSequence) {
-
+    isPrinting = true;
     let logtemp= log.slice();
     if (isSequence)
         analysisLog(logtemp);
@@ -167,10 +167,12 @@ async function printGridStepbyStep(log, delay, isSequence) {
     {
         if (canceled)
             return;
+
         // console.log(getPos(log[i].row,log[i].col))
         document.getElementsByName('cell')[getPos(logtemp[i].row,logtemp[i].col)].value = await logtemp[i].value;
         await sleep(delay*1000);
     }
+    isPrinting = false;
 }
 
 function checkSubmit (grid) {
@@ -300,6 +302,7 @@ let grid=[];
 let gridOriginal=[];
 let log = []
 let canceled;
+let isPrinting;
 // ADD event
 
 let cells = document.getElementsByName('cell');
@@ -366,10 +369,12 @@ document.getElementById('submit').addEventListener('click', function () {
 
 });
 document.getElementById('cancelSodoku').addEventListener('click', function () {
-    if (!isSolved) {
+    if (isPrinting) {
         canceled = true;
         document.getElementById('canceled').classList.remove('invisible');
     }
+        
+
 
 })
 
