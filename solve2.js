@@ -1,8 +1,8 @@
 const N = 9;
 const UNASSIGNED = 0;
-const EASY_LEVEL = 10;
-const MEDIUM_LEVEL = 30;
-const HARD_LEVEL = 60;
+const EASY_LEVEL = 30;
+const MEDIUM_LEVEL = 50;
+const HARD_LEVEL = 65;
 const EASY = 1;
 const MEDIUM = 2;
 const HARD = 3;
@@ -200,17 +200,16 @@ function isNumeric(n) {
 }
 
 function createEmptyPuzzle (N=9) {
-    return  [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0]
-    ];
+    let tempArr = [];
+    let grid = [];
+    for (var i = 0; i < N; i++) {
+            tempArr.push(0);
+    }
+
+    for (var i = 0; i < N; i++) {
+            grid.push(tempArr.slice());
+    }
+    return grid;
 }
 
 function randomNumber (N=9) {
@@ -218,7 +217,7 @@ function randomNumber (N=9) {
     return randomnum<0?0:randomnum;
 }
 
-function createRandomPuzzle (level=1) {
+function createRandomPuzzle (level=EASY) {
     let grid = createEmptyPuzzle();
     solveSudoku(grid);
     let row;
@@ -259,40 +258,34 @@ function solveSudoku (grid ,sleepTime = 0) {
     let UnassignedLocation=[];
     let isFilled; // flag true if 
     // let numToStart=1;
-    let possibleCell = [1,2,3,4,5,6,7,8,9];
+    let possibleNum = [1,2,3,4,5,6,7,8,9];
     let stepDone;
     while (!isEmpty(UnassignedLocation = findUnassignedLocation(grid))) {
         isFilled= false;
-        // for (let num = numToStart; num <= N; num++) { //For loop
 
-        while (!isEmpty(possibleCell)) {
-            let randNumPos = Math.floor(Math.random()*possibleCell.length);
-            let num = possibleCell[randNumPos];
-            possibleCell.splice(randNumPos,1);
+        while (!isEmpty(possibleNum)) {
+            let randNumPos = Math.floor(Math.random()*possibleNum.length);
+            let num = possibleNum[randNumPos];
+            possibleNum.splice(randNumPos,1);
             if (isSafe(grid,UnassignedLocation[0],UnassignedLocation[1],num)){
 
                 grid[UnassignedLocation[0]][UnassignedLocation[1]]=num;
-                logSolve.push({row:UnassignedLocation[0],col:UnassignedLocation[1], possibleCell:possibleCell,val:num}); // Save to logSolve 
+                logSolve.push({row:UnassignedLocation[0],col:UnassignedLocation[1], possibleNum:possibleNum,val:num}); // Save to logSolve 
                 log.push({row:UnassignedLocation[0],col:UnassignedLocation[1],value:num});
-                // console.log(`Assigned to [${UnassignedLocation[0]}][${UnassignedLocation[1]}] value: ${num}`)
                 i++;
                 isFilled=true;
-                // numToStart = 1;
-                possibleCell = [1,2,3,4,5,6,7,8,9];
+                possibleNum = [1,2,3,4,5,6,7,8,9];
                 break;
             }
         }
-        // }//End of for
         if (!isFilled){
             if(isEmpty(logSolve))
                 return false;
             i--;
             grid[logSolve[i].row][logSolve[i].col]=UNASSIGNED;
-            possibleCell = logSolve[i].possibleCell;
-            //     return false;
+            possibleNum = logSolve[i].possibleNum;
             logSolve.pop();
         }
-        
     }
     return true;
 }
@@ -303,6 +296,9 @@ let gridOriginal=[];
 let log = []
 let canceled;
 let isPrinting;
+
+
+
 // ADD event
 
 let cells = document.getElementsByName('cell');
@@ -317,8 +313,15 @@ for (var i = 0; i < cells.length; i++) {
 }
 
 document.getElementById('createSodoku').addEventListener('click', function () {
+    if (isPrinting) {
+        canceled = true;
+        document.getElementById('canceled').classList.remove('invisible');
+    }
+    else
+        canceled = false;
+    console.log(canceled);
+    isPrinting = false;
     clearGrid(N, true);
-    canceled = false;
     let levelOptions = document.getElementsByName('level');
     let level;
     for (var i = 0; i < levelOptions.length; i++) {
@@ -340,6 +343,7 @@ document.getElementById('createSodoku').addEventListener('click', function () {
     // alert('message?: DOMString')
 })
 document.getElementById('solveSudoku').addEventListener('click',async function () {
+    // isPrinting = false;
     log=[];
     if (solveSudoku(grid)) {
         let sleepTime = document.getElementById('sleepTime').value;
