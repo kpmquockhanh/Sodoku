@@ -159,11 +159,14 @@ function analysisLog (log) {
                 log.splice(j, 1 );
 }
 async function printGridStepbyStep(log, delay, isSequence) {
+
     let logtemp= log.slice();
     if (isSequence)
         analysisLog(logtemp);
     for(let i = 0; i<logtemp.length;i++)
     {
+        if (canceled)
+            return;
         // console.log(getPos(log[i].row,log[i].col))
         document.getElementsByName('cell')[getPos(logtemp[i].row,logtemp[i].col)].value = await logtemp[i].value;
         await sleep(delay*1000);
@@ -246,23 +249,16 @@ function createRandomPuzzle (level=1) {
     return grid;
 }
 
-function solvePuzzle (grid) {
-    if (solveSudoku(grid)) {
-    }
-    else {
-    console.log("Failed");
-    }
-}
-
 
 function solveSudoku (grid ,sleepTime = 0) {
+
     let logSolve = []; // Log step by step in algorithm
     let i = 0; // index in logSovle
     let UnassignedLocation=[];
     let isFilled; // flag true if 
     // let numToStart=1;
     let possibleCell = [1,2,3,4,5,6,7,8,9];
-
+    let stepDone;
     while (!isEmpty(UnassignedLocation = findUnassignedLocation(grid))) {
         isFilled= false;
         // for (let num = numToStart; num <= N; num++) { //For loop
@@ -294,6 +290,7 @@ function solveSudoku (grid ,sleepTime = 0) {
             //     return false;
             logSolve.pop();
         }
+        
     }
     return true;
 }
@@ -302,7 +299,7 @@ function solveSudoku (grid ,sleepTime = 0) {
 let grid=[];
 let gridOriginal=[];
 let log = []
-
+let canceled;
 // ADD event
 
 let cells = document.getElementsByName('cell');
@@ -318,6 +315,7 @@ for (var i = 0; i < cells.length; i++) {
 
 document.getElementById('createSodoku').addEventListener('click', function () {
     clearGrid(N, true);
+    canceled = false;
     let levelOptions = document.getElementsByName('level');
     let level;
     for (var i = 0; i < levelOptions.length; i++) {
@@ -325,7 +323,6 @@ document.getElementById('createSodoku').addEventListener('click', function () {
             level = i+1;
             break;
         }
-
     }
     grid = createRandomPuzzle(level);
     gridOriginal = grid.slice();
@@ -335,21 +332,27 @@ document.getElementById('createSodoku').addEventListener('click', function () {
         if(cells[i].value!='')
             cells[i].setAttribute('disabled','true')
     }
+    document.getElementById('Solved').classList.add('invisible');
+    document.getElementById('canceled').classList.add('invisible');
     // alert('message?: DOMString')
 })
-document.getElementById('solveSodoku').addEventListener('click', function () {
+document.getElementById('solveSudoku').addEventListener('click',async function () {
     log=[];
-    solvePuzzle(grid);
+    if (solveSudoku(grid)) {
+        let sleepTime = document.getElementById('sleepTime').value;
+        if (sleepTime==0)
+            printGrid(grid,N);
+        else
+            await printGridStepbyStep(log,sleepTime,document.getElementById('sequence').checked);
+        if (!canceled)
+            await document.getElementById('Solved').classList.remove('invisible');
+    };
     // clearGrid(N);
     // printGrid(grid,N);
-    let sleepTime = document.getElementById('sleepTime').value;
-    if (sleepTime==0)
-        printGrid(grid,N);
-    else
-        printGridStepbyStep(log,sleepTime,document.getElementById('sequence').checked);
-})
+    
+});
 document.getElementById('submit').addEventListener('click', function () {
-    solvePuzzle(grid);
+    solveSudoku(grid);
     if (checkSubmit(grid)){
         document.getElementById('correct').classList.remove('d-none')
         document.getElementById('incorrect').classList.add('d-none')
@@ -358,6 +361,13 @@ document.getElementById('submit').addEventListener('click', function () {
         document.getElementById('correct').classList.add('d-none')
         document.getElementById('incorrect').classList.remove('d-none')
     }
+    document.getElementById('Solved').classList.add('invisible');
+    document.getElementById('canceled').classList.add('invisible');
+
+});
+document.getElementById('cancelSodoku').addEventListener('click', function () {
+    canceled = true;
+    document.getElementById('canceled').classList.remove('invisible');
 
 })
 
