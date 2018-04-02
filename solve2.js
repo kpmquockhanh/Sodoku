@@ -170,6 +170,7 @@ async function printGridStepbyStep(log, delay, isSequence) {
 
         // console.log(getPos(log[i].row,log[i].col))
         document.getElementsByName('cell')[getPos(logtemp[i].row,logtemp[i].col)].value = await logtemp[i].value;
+        document.getElementsByName('cell')[getPos(logtemp[i].row,logtemp[i].col)].classList.remove('bg-danger');
         await sleep(delay*1000);
     }
     isPrinting = false;
@@ -355,10 +356,12 @@ document.getElementById('solveSudoku').addEventListener('click',async function (
     log=[];
     grid = cloneGrid(gridOriginal);
     if (solveSudoku(grid)) {
-        // console.log(grid);
         let sleepTime = document.getElementById('sleepTime').value;
         if (sleepTime==0)
+        {
+            clearGrid(N);
             printGrid(grid,N);
+        }
         else
             await printGridStepbyStep(log,sleepTime,document.getElementById('sequence').checked);
         if (!canceled)
