@@ -32,7 +32,7 @@
 
 </head>
 <body>
-    <div class="container d-flex align-items-center w-100 mt-5">
+    <div class="container w-100 mt-5 row">
         <table class="table table-bordered d-flex justify-content-center align-content-center col-8">
             <tr>
                 <td><input type="number" class="noarr" name="cell"></td>
@@ -135,19 +135,19 @@
             </tr>
         </table>
         <div class="button col-4">
-            <div class="input-group d-flex justify-content-center">
-                <div class="input-group-prepend d-flex justify-content-around">
-                    <div class="input-group-text">
-                        <input type="radio" class="mr-2" name="level" aria-label="" checked>
-                        <input type="radio" class="mr-2" name="level" aria-label="">
+            <div class="input-group col-12 p-0 d-flex justify-content-center">
+                <div class="input-group-prepend p-0 m-0">
+                    <div class="input-group-text d-block">
+                        <input type="radio" name="level" aria-label="" checked>
+                        <input type="radio" name="level" aria-label="">
                         <input type="radio" name="level" aria-label="">
                     </div>
                 </div>
 
-                 <button class="btn btn-outline-primary d-block" id="createSodoku">Tạo sodoku</button>
+                 <button class="btn btn-outline-primary" id="createSodoku">Tạo sodoku</button>
             </div>
        
-        <div class="input-group mt-5 col-12 mx-auto">
+        <div class="input-group mt-5 col-12 mx-auto p-0">
 
             <input type="number" min="0" step="1" class="form-control" placeholder="Sleep" aria-label="Recipient's username" aria-describedby="basic-addon2" id="sleepTime">
             <div class="input-group-append">
@@ -160,24 +160,17 @@
             </div>
             
         </div>
-        <button class="btn btn-outline-danger d-block mx-auto mt-5" id="solveSudoku">Giải sodoku</button>
-        <button class="btn btn-outline-secondary d-block mx-auto mt-5" id="cancelSodoku">Huỷ tiến trình giải sodoku</button>
-        <div class="alert alert-success mt-4 invisible" id="Solved">Status: Solved!</div>
-        <div class="alert alert-danger mt-4 invisible" id="canceled">Status: Canceled!</div>
-    </div>
-</div>
-<div class="container">
-    <div class="row">
-        <div class="col-2 offset-3"><button class="btn btn-outline-warning d-block m-auto col-9" id="submit">Submit</button></div>
+        <button class="btn btn-outline-success mt-5 col-12" id="solveSudoku"> <i class="fas fa-play mr-2"></i> Giải Sudoku</button>
+        <button class="btn btn-outline-danger mt-5 col-12 d-none" id="cancelSodoku"> <i class="fas fa-stop mr-2"></i> Dừng Sudoku</button>
+        <button class="btn btn-outline-warning col-12 mt-5" id="submit">Submit</button>
+        <div class="alert alert-success mt-4 d-none" id="Solved">Status: Solved!</div>
+        <div class="alert alert-danger mt-4 d-none" id="canceled">Status: Paused!</div>
 
-    </div>
-    <div class="row">
-        <div class="alert alert-success col-4 offset-2 mt-4 d-none" id="correct">Status: Correct!</div>
-    </div>
-    <div class="row">
-        <div class="alert alert-warning col-4 offset-2 mt-4 d-none" id="incorrect">Status: InCorrect!</div>
-    </div>
+        <div class="alert alert-success mt-4 d-none" id="correct">Status: Correct!</div>
 
+
+        <div class="alert alert-warning mt-4 d-none" id="incorrect">Status: InCorrect!</div>
+    </div>
 </div>
 
 </div>
@@ -185,8 +178,9 @@
 
 
 </body>
-<script type="text/javascript" src="solve2.js"></script>
+<script type="text/javascript" src="solve.js"></script>
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl" crossorigin="anonymous"></script>
 </html>

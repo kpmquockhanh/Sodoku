@@ -1,5 +1,12 @@
 const N = 9;
 const UNASSIGNED = 0;
+const EASY_LEVEL = 20;
+const MEDIUM_LEVEL = 30;
+const HARD_LEVEL = 40;
+const EASY = 1;
+const MEDIUM = 2;
+const HARD = 3;
+
 
 function printGrid(grid,N) {
     let pos=0;
@@ -8,14 +15,14 @@ function printGrid(grid,N) {
             if (grid[row][col]!='')
                 document.getElementsByName('cell')[pos].value = grid[row][col];
             pos++;
-            
         }
-    }
-    
+    } 
 }
 
-function clearGrid (N) {
+function clearGrid (N , isOverided = false) {
     for (var i = 0; i < N*N; i++) {
+        if (isOverided)
+            document.getElementsByName('cell')[i].removeAttribute('disabled');
         document.getElementsByName('cell')[i].classList.remove('bg-danger');
         document.getElementsByName('cell')[i].value = '';    
     }
@@ -58,23 +65,27 @@ function isSafe(grid, row, col, num){
 }
 
 function isCorrectRow (grid,row) {
-    for (let i = 1; i < N; i++)
+    let count = 0;
+    for (let i = 1; i <= N; i++)
     {
         let isAppear = false;
         for (let col = 0; col < N; col++)
         {
             if (grid[row][col]==i)
                 isAppear=true;
-
         }
         if (!isAppear)
             return false; 
+        count++;
     }
+    if (count!=9)
+        return false;
     return true;
 }
 
 function isCorrectCol (grid,col) {
-    for (let i = 1; i < N; i++)
+    let count = 0;
+    for (let i = 1; i <= N; i++)
     {
         let isAppear = false;
         for (let row = 0; row < N; row++)
@@ -85,7 +96,10 @@ function isCorrectCol (grid,col) {
         }
         if (!isAppear)
             return false; 
+        count++;
     }
+    if (count!=9)
+        return false;
     return true;
 }
 
@@ -128,70 +142,10 @@ function findUnassignedLocation(grid){
     for (let icol = 0; icol < N; icol++)
         if (grid[irow][icol] == UNASSIGNED)
         {
-            return [irow,icol]
+            return [irow,icol];
         }
         
     return [];
-}
-
-
-// function solveSudoku(grid){
-//     let row={value:0}
-//     let col={value:0}
-
-//     if (!findUnassignedLocation(grid, row, col))
-//     return true; // success! no empty space
-//     for (let num = 1; num <= N; num++) {
-//         if (isSafe(grid, row.value, col.value, num)) {
-//             grid[row.value][col.value] =  num; // make tentative assignment
-//             log.push({
-//                 row:row.value,
-//                 col:col.value,
-//                 value:num
-//             })
-//             if (solveSudoku(grid))
-//                 return true;  // return, if success// return, if success
-//              grid[row.value][col.value] =  UNASSIGNED;  // failure, unmake & try again
-//         }
-//     }
-//     return false; // triggers backtracking
-// }
-
-function solveSudoku (grid) {
-    let logSolve = []; // Log step by step in algorithm
-    let i = 0; // index in logSovle
-    let UnassignedLocation=[];
-    let isFilled; // flag true if 
-    let numToStart=1;
-
-    while (isSolved) {
-        isFilled= false;
-        UnassignedLocation = findUnassignedLocation(grid);
-        if(isEmpty(UnassignedLocation))
-            return true //Solved
-        for (let num = numToStart; num <= N; num++) {
-            if (isSafe(grid,UnassignedLocation[0],UnassignedLocation[1],num)){
-                grid[UnassignedLocation[0]][UnassignedLocation[1]]=num;
-                logSolve.push({row:UnassignedLocation[0],col:UnassignedLocation[1],val:num}); // Save to logSolve 
-                i++;
-                isFilled=true;
-                numToStart = 1;
-                //console.log('Grid '+ UnassignedLocation[0] + ' - ' + UnassignedLocation[1] + ' = ' +num)
-                break;
-            }
-        }
-        if (!isFilled){
-            i--;
-            grid[logSolve[i].row][logSolve[i].col]=UNASSIGNED;
-            //console.log('Grid '+ logSolve[i].row + ' - ' + logSolve[i].row + ' = ' +UNASSIGNED)
-            numToStart = logSolve[i].val+1;
-            if(numToStart > 9 && logSolve[i].row == 0 && logSolve[i].col==0)
-                return false;
-            logSolve.pop();
-
-            
-        }
-    }
 }
 
 function sleep(ms) {
@@ -209,33 +163,67 @@ function analysisLog (log) {
             if(log[i].row==log[j].row && log[i].col==log[j].col)
                 log.splice(j, 1 );
 }
-async function printGridStepbyStep(log,delay) {
-    for(let i = 0; i<log.length;i++)
+async function printGridStepbyStep(grid, delay, isSequence) {
+    if (!isPrinting)
     {
-        // console.log(getPos(log[i].row,log[i].col))
-        document.getElementsByName('cell')[getPos(log[i].row,log[i].col)].value = await log[i].value;
+        clearGrid(N);
+        printGrid(gridOriginal,N);
+    }
+    isPrinting = true;
+    let templog =log.slice();
+    if (isSequence)
+        analysisLog(templog);
+    for (let i = currentPos; i < templog.length; i++) {
+        if (canceled){
+            currentPos = i;
+            return;
+        }
+        document.getElementsByName('cell')[getPos(templog[i].row,templog[i].col)].value = templog[i].value;
+        // document.getElementsByName('cell')[i].classList.remove('bg-danger');
         await sleep(delay*1000);
     }
+    // for(let i = currentPos; i<N*N;i++)
+    // {
+    //     if (canceled){
+    //         currentPos = i;
+    //         return;
+    //     }
+
+    //     // console.log(getPos(log[i].row,log[i].col))
+    //     if (!document.getElementsByName('cell')[i].getAttribute('disabled')) {
+    //         document.getElementsByName('cell')[i].value = grid[Math.floor(i/9)][i%9];
+    //         document.getElementsByName('cell')[i].classList.remove('bg-danger');
+    //         await sleep(delay*1000);
+    //     }
+        
+    // }
+    isPrinting = false;
+    currentPos = 0;
 }
 
-function checkSubmit (grid) {
+function checkSubmit () {
     //Scan grid
-    let f=false;
-    for (let row = 0; row<N; row++)
-        for (let col = 0; col<N; col++){
-            if(grid[row][col] != document.getElementsByName('cell')[getPos(row,col)].value)
-            {
-                document.getElementsByName('cell')[getPos(row,col)].classList.add('bg-danger')
-                f=true;
+    let getgrid = convertTabletoGrid();
+    console.log(getgrid)
+    for (let i = 0; i < N; i++) {
+        if (!isCorrectRow(getgrid,i))
+            for (let j = 0; j < N; j++){
+                if (!document.getElementsByName('cell')[getPos(i,j)].getAttribute('disabled'))
+                    document.getElementsByName('cell')[getPos(i,j)].classList.add('bg-danger');
             }
-            else{
-                document.getElementsByName('cell')[getPos(row,col)].classList.remove('bg-danger')
-            }
+        else
+            for (let j = 0; j < N; j++)
+                if (!document.getElementsByName('cell')[getPos(i,j)].getAttribute('disabled'))
+                    document.getElementsByName('cell')[getPos(i,j)].classList.remove('bg-danger');
+        // if (!isCorrectCol(grid,i))
+        //     for (let j = 0; j < N; j++)
+        //         if (document.getElementsByName('cell')[getPos(i,j)].getAttribute('disabled'))
+        //             document.getElementsByName('cell')[getPos(j,i)].classList.add('bg-danger');
+        // if (!isCorrectBox(grid,i))
+            // for (let j = 0; j < N; j++)
+            //     document.getElementsByName('cell')[getPos(j,i)].classList.add('bg-danger');
+    }
 
-        }
-    if (f) 
-        return false;
-    return true;
 }
 
 function isNumeric(n) {
@@ -243,60 +231,118 @@ function isNumeric(n) {
 }
 
 function createEmptyPuzzle (N=9) {
-    return  [
-    [0, 0, 7, 0, 3, 0, 8, 0, 0],
-    [0, 0, 0, 2, 0, 5, 0, 0, 0],
-    [4, 0, 0, 9, 0, 6, 0, 0, 1],
-    [0, 4, 3, 0, 0, 0, 2, 1, 0],
-    [1, 0, 0, 0, 0, 0, 0, 0, 5],
-    [0, 5, 8, 0, 0, 0, 6, 7, 0],
-    [5, 0, 0, 1, 0, 8, 0, 0, 9],
-    [0, 0, 0, 5, 0, 3, 0, 0, 0],
-    [0, 0, 2, 0, 9, 0, 5, 0, 0]
-];
-}
+    let tempArr = [];
+    let grid = [];
+    for (var i = 0; i < N; i++) {
+            tempArr.push(0);
+    }
 
-function randomNumber (N=9) {
-    let randomnum=Math.floor((Math.random() * 10))
-    return randomnum<0?0:randomnum;
-}
-
-function createRandomPuzzle () {
-    let grid = createEmptyPuzzle();
-
-    for (var row = 0; row < N; row++)
-        for (var col = 0; col < N; col++){
-            let num = randomNumber();
-            let rate = randomNumber();
-            if (isSafe(grid,row,col,num) && rate>=8)
-                grid[row][col]=num;
-        }
+    for (var i = 0; i < N; i++) {
+            grid.push(tempArr.slice());
+    }
     return grid;
 }
 
-
-
-let grid= createEmptyPuzzle();
-// console.log(grid);
-let gridOriginal=[];
-
-function solvePuzzle (grid) {
-    if (solveSudoku(grid)) {
-    // let sleepTime = document.getElementById('sleepTime').value;
-    // analysisLog(log);
-    }
-    else {
-    console.log("Failed");
-    }
+function randomNumber (N=9) {
+    let randomnum=Math.floor((Math.random() * N));
+    return randomnum<0?0:randomnum;
 }
 
-// if (solveSudoku(grid)) {
-//     // let sleepTime = document.getElementById('sleepTime').value;
-//     analysisLog(log)
-// }
-// else {
-//     alert('Failed')
-// }
+function createRandomPuzzle (level=EASY) {
+    let grid = createEmptyPuzzle();
+    solveSudoku(grid);
+    let row;
+    let col;
+    let countHide;
+    if (isNumeric(level)) {
+        switch(level) {
+            case 1:
+                countHide = EASY_LEVEL;
+                break;
+            case 2:
+                countHide = MEDIUM_LEVEL;
+                break;
+            case 3:
+                countHide = HARD_LEVEL;
+                break;
+            default: countHide = HARD_LEVEL;
+        }
+    }
+    while (countHide>0) {
+        row = randomNumber();
+        col = randomNumber();
+
+        let isHide = randomNumber()>2?true:false; // Rate Hide is 80%;
+            if (isHide && grid[row][col]!=0){
+                countHide--;
+                grid[row][col]=0;
+            }
+    }
+    return grid;
+}
+
+function cloneGrid (grid) {
+    let tempGrid = [];
+    for (var i = 0; i < grid.length; i++) {
+        tempGrid.push(grid[i].slice());
+    }
+    return tempGrid;
+}
+
+function convertTabletoGrid () {
+    let convertedGrid =createEmptyPuzzle();
+    for (let i = 0; i < N*N; i++) {
+        convertedGrid[Math.floor(i/9)][i%9] = document.getElementsByName('cell')[i].value==''?0:parseInt(document.getElementsByName('cell')[i].value);
+    }
+    return convertedGrid;
+}
+
+function solveSudoku (grid ,sleepTime = 0) {
+
+    let logSolve = []; // Log step by step in algorithm
+    let i = 0; // index in logSolve
+    let UL=[];
+    let isFilled; // flag true if 
+    let possibleNum = [1,2,3,4,5,6,7,8,9];
+    while (!isEmpty(UL = findUnassignedLocation(grid))) {
+        isFilled= false;
+
+        while (!isEmpty(possibleNum)) {
+            let randNumPos = Math.floor(Math.random()*possibleNum.length);
+            let num = possibleNum[randNumPos];
+            possibleNum.splice(randNumPos,1);
+            if (isSafe(grid, UL[0], UL[1], num)){
+
+                grid[UL[0]][UL[1]] = num;
+                logSolve.push({row:UL[0], col:UL[1], possibleNum:possibleNum, val:num});
+                log.push({row:UL[0], col:UL[1], value:num});
+                i++;
+                isFilled=true;
+                possibleNum = [1,2,3,4,5,6,7,8,9];
+                break;
+            }
+        }
+        if (!isFilled){
+            if(isEmpty(logSolve))
+                return false;
+            i--;
+            grid[logSolve[i].row][logSolve[i].col]=UNASSIGNED;
+            possibleNum = logSolve[i].possibleNum.slice();
+            logSolve.pop();
+        }
+    }
+    return true;
+}
+
+
+let grid=[];
+let gridOriginal=[];
+let log = [];
+let canceled;
+let isPrinting;
+let currentPos;
+
+// ADD event
 
 let cells = document.getElementsByName('cell');
 for (var i = 0; i < cells.length; i++) {
@@ -304,35 +350,100 @@ for (var i = 0; i < cells.length; i++) {
         // event.target.value=''
         if (isNumeric(event.key)) {
             // console.log('OK')
-            event.target.value=event.key
+            event.target.value=event.key;
         }
     })
 }
 
 document.getElementById('createSodoku').addEventListener('click', function () {
-    clearGrid(N);
-    grid = createEmptyPuzzle();
-    gridOriginal = grid.slice(0);
-    
-    printGrid(gridOriginal,N);
+    currentPos = 0;
+    document.getElementById('correct').classList.add('d-none')
+    document.getElementById('incorrect').classList.add('d-none')
+    if(isPrinting)
+    {
+        canceled = true;
+        document.getElementById('cancelSodoku').classList.add('d-none');
+        document.getElementById('solveSudoku').classList.remove('d-none');
+    }
+    // console.log(canceled);
+    isPrinting = false;
+    clearGrid(N, true);
+    let levelOptions = document.getElementsByName('level');
+    let level;
+    for (var i = 0; i < levelOptions.length; i++) {
+        if (levelOptions[i].checked){
+            level = i+1;
+            break;
+        }
+    }
+    grid = createRandomPuzzle(level);
+    gridOriginal = cloneGrid(grid);
+    printGrid(grid,N);
     let cells = document.getElementsByName('cell');
     for (var i = 0; i < cells.length; i++){
         if(cells[i].value!='')
             cells[i].setAttribute('disabled','true')
     }
-    // alert('message?: DOMString')
-})
-document.getElementById('solveSodoku').addEventListener('click', function () {
-    solvePuzzle(grid);
-    clearGrid(N);
-    printGrid(gridOriginal,N);
-    printGrid(grid,N);
-    let sleepTime = document.getElementById('sleepTime').value;
-    // printGridStepbyStep(log,sleepTime);
-})
+    document.getElementById('Solved').classList.add('d-none');
+    document.getElementById('canceled').classList.add('d-none');
+});
+
+
+
+document.getElementById('solveSudoku').addEventListener('click',async function () {
+    // isPrinting = false;
+    document.getElementById('Solved').classList.add('d-none');
+    document.getElementById('correct').classList.add('d-none')
+    document.getElementById('incorrect').classList.add('d-none')
+    if (!isEmpty(grid)) {
+        document.getElementById('cancelSodoku').classList.remove('d-none');
+        document.getElementById('solveSudoku').classList.add('d-none');
+        document.getElementById('canceled').classList.add('d-none');
+    }
+    log = [];
+    grid = cloneGrid(gridOriginal);
+    if (!isEmpty(grid))
+        if (solveSudoku(grid)) {
+            let sleepTime = document.getElementById('sleepTime').value;
+            if (sleepTime==0)
+            {
+                clearGrid(N);
+                printGrid(grid,N);
+            }
+            else{
+                canceled = false;
+                // console.log(grid);
+                await printGridStepbyStep(grid,sleepTime,document.getElementById('sequence').checked);
+            }
+
+            if (!canceled)
+            {
+                await document.getElementById('Solved').classList.remove('d-none');
+                document.getElementById('cancelSodoku').classList.add('d-none');
+                document.getElementById('solveSudoku').classList.remove('d-none');
+            }
+
+        };
+        // clearGrid(N);
+        // printGrid(grid,N);
+        
+        });
+
+    document.getElementById('cancelSodoku').addEventListener('click', function () {
+    document.getElementById('solveSudoku').classList.remove('d-none');
+    document.getElementById('cancelSodoku').classList.add('d-none');
+
+
+    document.getElementById('canceled').classList.remove('d-none');
+    if (isPrinting) {
+        canceled = true;
+        document.getElementById('canceled').classList.remove('invisible');
+    }
+});
+
 document.getElementById('submit').addEventListener('click', function () {
-    solvePuzzle(grid);
-    if (checkSubmit(grid)){
+    // checkSubmit();
+    if (isSolved(convertTabletoGrid())){
         document.getElementById('correct').classList.remove('d-none')
         document.getElementById('incorrect').classList.add('d-none')
     }
@@ -340,7 +451,10 @@ document.getElementById('submit').addEventListener('click', function () {
         document.getElementById('correct').classList.add('d-none')
         document.getElementById('incorrect').classList.remove('d-none')
     }
+    document.getElementById('Solved').classList.add('d-none');
+    document.getElementById('canceled').classList.add('d-none');
 
-})
+});
+
 
 
