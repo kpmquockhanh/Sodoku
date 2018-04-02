@@ -157,10 +157,12 @@ function analysisLog (log) {
                 log.splice(j, 1 );
 }
 async function printGridStepbyStep(log, delay, isSequence) {
+    // console.log(`log ${log}`);
     isPrinting = true;
     let logtemp= log.slice();
     if (isSequence)
         analysisLog(logtemp);
+
     for(let i = 0; i<logtemp.length;i++)
     {
         if (canceled)
@@ -248,6 +250,13 @@ function createRandomPuzzle (level=EASY) {
     return grid;
 }
 
+function cloneGrid (grid) {
+    let tempGrid = [];
+    for (var i = 0; i < grid.length; i++) {
+        tempGrid.push(grid[i].slice());
+    }
+    return tempGrid;
+}
 
 function solveSudoku (grid ,sleepTime = 0) {
 
@@ -309,13 +318,14 @@ for (var i = 0; i < cells.length; i++) {
 }
 
 document.getElementById('createSodoku').addEventListener('click', function () {
-    if (isPrinting) {
+    if(isPrinting)
+    {
         canceled = true;
-        document.getElementById('canceled').classList.remove('invisible');
+
     }
     else
         canceled = false;
-    console.log(canceled);
+    // console.log(canceled);
     isPrinting = false;
     clearGrid(N, true);
     let levelOptions = document.getElementsByName('level');
@@ -327,7 +337,7 @@ document.getElementById('createSodoku').addEventListener('click', function () {
         }
     }
     grid = createRandomPuzzle(level);
-    gridOriginal = grid.slice();
+    gridOriginal = cloneGrid(grid);
     printGrid(grid,N);
     let cells = document.getElementsByName('cell');
     for (var i = 0; i < cells.length; i++){
@@ -336,12 +346,16 @@ document.getElementById('createSodoku').addEventListener('click', function () {
     }
     document.getElementById('Solved').classList.add('invisible');
     document.getElementById('canceled').classList.add('invisible');
-    // alert('message?: DOMString')
 });
+
+
+
 document.getElementById('solveSudoku').addEventListener('click',async function () {
     // isPrinting = false;
     log=[];
+    grid = cloneGrid(gridOriginal);
     if (solveSudoku(grid)) {
+        // console.log(grid);
         let sleepTime = document.getElementById('sleepTime').value;
         if (sleepTime==0)
             printGrid(grid,N);
@@ -355,8 +369,11 @@ document.getElementById('solveSudoku').addEventListener('click',async function (
     
 });
 document.getElementById('submit').addEventListener('click', function () {
-    solveSudoku(grid);
-    if (checkSubmit(grid)){
+    let tempGrid = cloneGrid(gridOriginal);
+    
+    solveSudoku(tempGrid);
+    // console.log(grid);
+    if (checkSubmit(tempGrid)){
         document.getElementById('correct').classList.remove('d-none')
         document.getElementById('incorrect').classList.add('d-none')
     }
