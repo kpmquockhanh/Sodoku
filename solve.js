@@ -409,6 +409,9 @@ document.getElementById('solveSudoku').addEventListener('click',async function (
             {
                 clearGrid(N);
                 printGrid(grid,N);
+                document.getElementById('Solved').classList.remove('d-none');
+                document.getElementById('cancelSodoku').classList.add('d-none');
+                document.getElementById('solveSudoku').classList.remove('d-none');
             }
             else{
                 canceled = false;
@@ -418,7 +421,7 @@ document.getElementById('solveSudoku').addEventListener('click',async function (
 
             if (!canceled)
             {
-                await document.getElementById('Solved').classList.remove('d-none');
+                document.getElementById('Solved').classList.remove('d-none');
                 document.getElementById('cancelSodoku').classList.add('d-none');
                 document.getElementById('solveSudoku').classList.remove('d-none');
             }
